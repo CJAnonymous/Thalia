@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153a34">
+  <title>Thalia Grocery | Store desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#dashboard" data-view-link="dashboard">
+        <span class="brand-mark"><i data-lucide="leaf"></i></span>
+        <span><strong>thalia</strong><small>GROCERY STORE</small></span>
+      </a>
+      <div class="nav-label">STORE</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view-link="dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></button>
+        <button class="nav-item" data-view-link="pos"><i data-lucide="shopping-cart"></i><span>Point of sale</span></button>
+        <button class="nav-item" data-view-link="inventory"><i data-lucide="package-2"></i><span>Inventory</span><span class="nav-count" id="inventory-count">0</span></button>
+        <button class="nav-item" data-view-link="utang"><i data-lucide="book-open-check"></i><span>Utang ledger</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="store-note"><span class="online-dot"></span><span><strong>Store desk</strong><small id="database-status">Connecting to MySQL database...</small></span></div>
+        <div class="sidebar-foot">THALIA GROCERY <span>•</span> DAILY OPERATIONS</div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark"><i data-lucide="leaf"></i></span><strong>thalia</strong></div>
+        <div class="breadcrumb"><span>Store desk</span><i data-lucide="chevron-right"></i><strong id="breadcrumb-current">Dashboard</strong></div>
+        <div class="topbar-actions">
+          <label class="search-box" aria-label="Search inventory">
+            <i data-lucide="search"></i>
+            <input id="global-search" type="search" placeholder="Search items..." autocomplete="off">
+            <kbd>⌘ K</kbd>
+          </label>
+          <button class="icon-button date-button" id="today-label" aria-label="Today's date"><i data-lucide="calendar-days"></i><span></span></button>
+          <button class="avatar" aria-label="Thalia Grocery account">T</button>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="view active" id="view-dashboard">
+          <div class="page-heading">
+            <div><p class="eyebrow">YOUR STORE AT A GLANCE</p><h1>Good day, Thalia <span class="heading-spark">✳</span></h1><p class="subheading" id="dashboard-date">Here’s what’s happening in your store today.</p></div>
+            <div class="heading-actions"><button class="button button-secondary" data-action="add-debt"><i data-lucide="circle-plus"></i><span>Add utang</span></button><button class="button button-primary" data-action="record-sale"><i data-lucide="shopping-cart"></i><span>Point of sale</span></button></div>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card sales-stat"><div class="stat-top"><span>Sales today</span><span class="stat-icon green-icon"><i data-lucide="banknote"></i></span></div><strong class="stat-value" id="today-sales">₱0.00</strong><div class="stat-foot"><span class="stat-indicator" id="sales-trend">TODAY</span><span>cash + utang sales</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Items in stock</span><span class="stat-icon coral-icon"><i data-lucide="boxes"></i></span></div><strong class="stat-value" id="stock-count">0</strong><div class="stat-foot"><span class="stat-indicator neutral-indicator" id="low-stock-count">0 LOW</span><span>need a restock check</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Utang to collect</span><span class="stat-icon yellow-icon"><i data-lucide="hand-coins"></i></span></div><strong class="stat-value" id="utang-total">₱0.00</strong><div class="stat-foot"><span class="stat-indicator amber-indicator" id="utang-people-count">0 PEOPLE</span><span>outstanding balance</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Transactions today</span><span class="stat-icon blue-icon"><i data-lucide="receipt-text"></i></span></div><strong class="stat-value" id="transaction-count">0</strong><div class="stat-foot"><span class="stat-indicator blue-indicator">SALES + PAYMENTS</span><span>recorded today</span></div></article>
+          </div>
+          <div class="chart-grid">
+            <article class="panel chart-panel"><div class="panel-heading"><div><p class="eyebrow">SALES REPORT</p><h2>Daily sales</h2></div><span class="chart-period"><span class="online-dot"></span>Last 7 days</span></div><div class="chart-summary"><strong id="week-sales">₱0.00</strong><span>sales recorded this week</span></div><div class="chart-canvas-wrap"><canvas id="sales-chart" aria-label="Line chart of sales over the last seven days"></canvas></div></article>
+            <article class="panel chart-panel bar-panel"><div class="panel-heading"><div><p class="eyebrow">STORE PULSE</p><h2>Sales by day</h2></div><button class="icon-button subtle" data-view-link="inventory" aria-label="View inventory"><i data-lucide="arrow-up-right"></i></button></div><div class="chart-summary"><strong id="best-day">—</strong><span>best day this week</span></div><div class="chart-canvas-wrap"><canvas id="daily-chart" aria-label="Bar chart of daily sales for the last seven days"></canvas></div></article>
+          </div>
+          <div class="content-grid">
+            <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">ON THE SHELF</p><h2>Inventory snapshot</h2></div><button class="text-button" data-view-link="inventory">All items <i data-lucide="arrow-right"></i></button></div><div class="table-scroll"><table><thead><tr><th>ITEM</th><th>PRICE</th><th>IN STOCK</th><th>STATUS</th><th></th></tr></thead><tbody id="dashboard-products"></tbody></table></div></article>
+            <article class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">RECENT ACTIVITY</p><h2>Latest transactions</h2></div><span class="live-label"><span class="online-dot"></span>LIVE</span></div><div class="activity-list" id="recent-activity"></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-pos">
+          <div class="page-heading"><div><p class="eyebrow">SALES COUNTER</p><h1>Point of sale</h1><p class="subheading">Add items to the cart, take payment, and give the right change.</p></div><span class="pos-register-status"><span class="online-dot"></span>REGISTER READY</span></div>
+          <div class="pos-workspace">
+            <section class="panel pos-catalog" aria-label="Product catalog">
+              <div class="pos-catalog-toolbar"><div><p class="eyebrow">PRODUCT CATALOG</p><h2>Choose items</h2></div><span class="pos-item-count"><span id="pos-visible-count">0</span> items</span></div>
+              <div class="pos-catalog-filters"><label class="search-box pos-search"><i data-lucide="search"></i><input id="pos-search" type="search" placeholder="Search products..." autocomplete="off"></label><label class="pos-category-wrap"><span class="sr-only">Filter by category</span><select id="pos-category"><option value="All">All categories</option></select></label></div>
+              <div class="pos-product-grid" id="pos-products"></div>
+              <div class="empty-state pos-no-products" id="pos-no-products" hidden><span class="empty-icon"><i data-lucide="search-x"></i></span><strong>No products found</strong><p>Try another search or category.</p></div>
+            </section>
+
+            <aside class="panel pos-order-panel" aria-label="Current order and payment">
+              <div class="pos-order-heading"><div><p class="eyebrow">CURRENT ORDER</p><h2>Cart <span class="table-count" id="pos-cart-count">0</span></h2></div><button class="text-button pos-clear-button" id="pos-clear-cart" type="button" disabled><i data-lucide="trash-2"></i><span>Clear</span></button></div>
+              <div class="pos-cart-list" id="pos-cart-rows"><div class="pos-cart-empty"><i data-lucide="shopping-basket"></i><strong>Your cart is empty</strong><span>Select a product to start an order.</span></div></div>
+              <div class="pos-checkout">
+                <div class="pos-subtotal"><span>Subtotal</span><strong id="pos-subtotal">₱0.00</strong></div>
+                <fieldset class="pos-payment-method"><legend>Payment method</legend><label><input type="radio" name="pos-payment" value="cash" checked><span><i data-lucide="banknote"></i>Cash</span></label><label><input type="radio" name="pos-payment" value="utang"><span><i data-lucide="book-open-check"></i>Utang</span></label></fieldset>
+                <label class="field pos-customer-field" id="pos-customer-field" hidden><span>Customer name</span><input id="pos-customer" type="text" placeholder="Enter customer name" autocomplete="off"></label>
+                <div class="pos-cash-fields" id="pos-cash-fields"><label class="field pos-tender-field"><span>Cash received <small>₱</small></span><input id="pos-tendered" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label><div class="pos-quick-cash"><button type="button" data-pos-tender="exact">Exact</button><button type="button" data-pos-tender="100">₱100</button><button type="button" data-pos-tender="500">₱500</button><button type="button" data-pos-tender="1000">₱1,000</button></div><div class="pos-change"><span>Change due</span><strong id="pos-change">₱0.00</strong></div><p class="pos-payment-hint" id="pos-payment-hint">Enter the amount received from the customer.</p></div>
+                <div class="pos-utang-hint" id="pos-utang-hint" hidden><i data-lucide="info"></i><span>The order total will be added to the customer's utang balance.</span></div>
+                <button class="button button-primary pos-checkout-button" id="pos-complete-sale" type="button" disabled><i data-lucide="check"></i><span>Complete cash sale</span></button>
+                <p class="pos-stock-note"><i data-lucide="package-check"></i>Stock updates after checkout.</p>
+              </div>
+            </aside>
+          </div>
+          <article class="panel pos-last-receipt" id="pos-receipt" hidden aria-live="polite"></article>
+        </section>
+
+        <section class="view" id="view-inventory">
+          <div class="page-heading"><div><p class="eyebrow">PRODUCTS & STOCK</p><h1>Inventory</h1><p class="subheading">Keep your shelves and prices up to date.</p></div><div class="heading-actions"><button class="button button-secondary" data-action="record-sale"><i data-lucide="shopping-cart"></i><span>Point of sale</span></button><button class="button button-primary" data-action="add-product"><i data-lucide="plus"></i><span>Add item</span></button></div></div>
+          <article class="panel inventory-panel"><div class="inventory-toolbar"><div><h2>All items <span class="table-count" id="product-count">0</span></h2><p>Search by name, category, or item code.</p></div><label class="search-box table-search"><i data-lucide="search"></i><input id="inventory-search" type="search" placeholder="Find an item..." autocomplete="off"><button class="clear-search" id="clear-search" aria-label="Clear search" hidden><i data-lucide="x"></i></button></label></div><div class="table-scroll"><table><thead><tr><th>ITEM</th><th>ITEM CODE</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>STATUS</th><th class="align-right">ACTIONS</th></tr></thead><tbody id="inventory-products"></tbody></table><div class="empty-state" id="empty-inventory" hidden><span class="empty-icon"><i data-lucide="search-x"></i></span><strong>No items found</strong><p>Try another name or add a new product.</p><button class="button button-secondary" data-action="add-product">Add item</button></div></div></article>
+          <p class="storage-hint"><i data-lucide="hard-drive"></i> Inventory changes are saved to the MySQL database.</p>
+        </section>
+
+        <section class="view" id="view-utang">
+          <div class="page-heading"><div><p class="eyebrow">CUSTOMER CREDIT</p><h1>Utang ledger</h1><p class="subheading">Track what customers owe and record payments as they come in.</p></div><div class="heading-actions"><button class="button button-primary" data-action="add-debt"><i data-lucide="plus"></i><span>Add utang</span></button></div></div>
+          <div class="stats-grid debt-stats"><article class="stat-card"><div class="stat-top"><span>Total outstanding</span><span class="stat-icon yellow-icon"><i data-lucide="hand-coins"></i></span></div><strong class="stat-value" id="ledger-outstanding">₱0.00</strong><div class="stat-foot"><span class="stat-indicator amber-indicator">TO COLLECT</span><span>unpaid balances</span></div></article><article class="stat-card"><div class="stat-top"><span>Customers with utang</span><span class="stat-icon blue-icon"><i data-lucide="users-round"></i></span></div><strong class="stat-value" id="ledger-customers">0</strong><div class="stat-foot"><span class="stat-indicator blue-indicator">ACTIVE</span><span>open balances</span></div></article><article class="stat-card"><div class="stat-top"><span>Collected today</span><span class="stat-icon green-icon"><i data-lucide="circle-check"></i></span></div><strong class="stat-value" id="ledger-collected">₱0.00</strong><div class="stat-foot"><span class="stat-indicator">PAYMENTS</span><span>recorded today</span></div></article><article class="stat-card"><div class="stat-top"><span>Utang added today</span><span class="stat-icon coral-icon"><i data-lucide="notebook-pen"></i></span></div><strong class="stat-value" id="ledger-added">₱0.00</strong><div class="stat-foot"><span class="stat-indicator neutral-indicator">NEW CHARGES</span><span>recorded today</span></div></article></div>
+          <article class="panel ledger-panel"><div class="inventory-toolbar"><div><h2>Customer balances <span class="table-count" id="debt-count">0</span></h2><p>Add new charges or record a full or partial payment.</p></div><label class="search-box table-search"><i data-lucide="search"></i><input id="debt-search" type="search" placeholder="Search customers..." autocomplete="off"></label></div><div class="table-scroll"><table><thead><tr><th>CUSTOMER</th><th>DETAILS</th><th>LAST UPDATED</th><th>ORIGINAL UTANG</th><th>PAID</th><th>REMAINING</th><th class="align-right">ACTIONS</th></tr></thead><tbody id="debt-rows"></tbody></table><div class="empty-state" id="empty-debts" hidden><span class="empty-icon"><i data-lucide="notebook-tabs"></i></span><strong>No outstanding utang</strong><p>New customer balances will show up here.</p><button class="button button-secondary" data-action="add-debt">Add utang</button></div></div></article>
+          <p class="storage-hint"><i data-lucide="lock-keyhole"></i> Customer balances are saved to the MySQL database.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="app-dialog" id="app-dialog" aria-labelledby="dialog-title"><form id="dialog-form" method="dialog"><div class="dialog-top"><span class="dialog-icon"><i data-lucide="plus"></i></span><button type="button" class="icon-button" data-close-dialog aria-label="Close dialog"><i data-lucide="x"></i></button></div><p class="eyebrow" id="dialog-eyebrow">STORE DESK</p><h2 id="dialog-title">Add item</h2><p class="dialog-description" id="dialog-description"></p><div class="dialog-fields" id="dialog-fields"></div><div class="dialog-actions"><button type="button" class="button button-secondary" data-close-dialog>Cancel</button><button type="submit" class="button button-primary" id="dialog-submit">Save item</button></div></form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
