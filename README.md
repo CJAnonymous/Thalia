@@ -1,0 +1,2 @@
+# Thalia
+tindahan niya
